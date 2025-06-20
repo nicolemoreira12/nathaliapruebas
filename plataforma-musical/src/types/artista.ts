@@ -5,4 +5,5 @@ export interface Artista {
   pais: string;
   descripcion: string;
   imagen?: string;
+  tokenVerificacion?: string;
 }

@@ -3,6 +3,7 @@ import type  {FormEvent } from 'react';
 import type{ ChangeEvent } from 'react';
 import type { Artista } from '../types/artista';
 
+
 interface Props {
   onAdd: (artista: Artista) => void;
 }

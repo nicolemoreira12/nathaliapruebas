@@ -1,5 +1,8 @@
+// Sugerencia para mejorar visualmente el formulario de Contenido
+// Puedes adaptar este ejemplo en tu archivo ContenidoForm.tsx
+
 import { useState } from 'react';
-import type { FormEvent } from 'react';
+import type { FormEvent} from 'react';
 import type { Contenido } from '../types/contenido';
 
 interface Props {
@@ -9,39 +12,52 @@ interface Props {
 const ContenidoForm = ({ onAdd }: Props) => {
   const [titulo, setTitulo] = useState('');
   const [tipo, setTipo] = useState<'Canción' | 'Álbum'>('Canción');
-  const [fecha, setFecha] = useState('');
-  const [lyrics, setLyrics] = useState('');
-  const [artistaId, setArtistaId] = useState(''); // Por ahora manual
+  const [url, setUrl] = useState('');
+  const [descripcion, setDescripcion] = useState('');
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const nuevoContenido: Contenido = {
+    onAdd({
       id: crypto.randomUUID(),
-      artistaId,
+      artistaId: '', // Provide a valid artistaId here or add an input for it
       titulo,
       tipo,
-      fecha_lanzamiento: fecha,
-      lyrics,
-    };
-    onAdd(nuevoContenido);
+      fecha_lanzamiento: '', // Provide a valid date or add an input for it
+      lyrics: '', // Provide lyrics or add an input for it
+    });
     setTitulo('');
     setTipo('Canción');
-    setFecha('');
-    setLyrics('');
-    setArtistaId('');
+    setUrl('');
+    setDescripcion('');
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Título" required />
-      <select value={tipo} onChange={(e) => setTipo(e.target.value as 'Canción' | 'Álbum')}>
-        <option value="Canción">Canción</option>
-        <option value="Álbum">Álbum</option>
-      </select>
-      <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} required />
-      <textarea value={lyrics} onChange={(e) => setLyrics(e.target.value)} placeholder="Letra..." />
-      <input value={artistaId} onChange={(e) => setArtistaId(e.target.value)} placeholder="ID del artista" required />
-      <button type="submit">Agregar Contenido</button>
+    <form onSubmit={handleSubmit} className="formulario-contenido">
+      <h2>Agregar Contenido</h2>
+      <div className="form-group">
+        <label>Título</label>
+        <input value={titulo} onChange={e => setTitulo(e.target.value)} required />
+      <div className="form-group">
+        <label>Tipo</label>
+        <select
+          value={tipo}
+          onChange={e => setTipo(e.target.value as 'Canción' | 'Álbum')}
+          required
+        >
+          <option value="Canción">Canción</option>
+          <option value="Álbum">Álbum</option>
+        </select>
+      </div>
+      </div>
+      <div className="form-group">
+        <label>URL</label>
+        <input value={url} onChange={e => setUrl(e.target.value)} required />
+      </div>
+      <div className="form-group">
+        <label>Descripción</label>
+        <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} />
+      </div>
+      <button type="submit" className="btn-agregar">Agregar</button>
     </form>
   );
 };
