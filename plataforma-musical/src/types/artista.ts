@@ -6,4 +6,5 @@ export interface Artista {
   descripcion: string;
   imagen?: string;
   tokenVerificacion?: string;
+  usuarioId: string;
 }
