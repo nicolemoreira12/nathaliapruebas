@@ -1,10 +1,11 @@
 export interface Artista {
+  imagen: string | undefined;
+  foto: string;
   id: string;
   nombre: string;
   genero: string;
   pais: string;
   descripcion: string;
-  imagen?: string;
   tokenVerificacion?: string;
   usuarioId: string;
 }

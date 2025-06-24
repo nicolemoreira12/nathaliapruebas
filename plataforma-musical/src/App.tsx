@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import ArtistaPage from './pages/ArtistaPage';
 import ContenidoPage from './pages/ContenidoPage';
-import EstadisticasPage from './pages/EstadisticaPage';
 import EventosPage from './pages/EventosPage';
 import ColaboracionesPage from './pages/ColaboracionesPage';
 import MetasPage from './pages/MetasPage';
@@ -22,7 +21,6 @@ const App = () => {
   });
 
   const [mostrarRegistro, setMostrarRegistro] = useState(false);
-  const [mensajeRegistro, setMensajeRegistro] = useState('');
   const [seccion, setSeccion] = useState('Artistas');
 
   useEffect(() => {
@@ -38,22 +36,18 @@ const App = () => {
   }, [usuarioActivo]);
 
   const handleRegistrar = (nuevo: Usuario) => {
-    const nuevosUsuarios = [...usuarios, nuevo];
-    setUsuarios(nuevosUsuarios);
-    setMostrarRegistro(false); // Mostrar login
-    setMensajeRegistro('✅ Registro exitoso. Ahora puedes iniciar sesión.');
+    setUsuarios([...usuarios, nuevo]);
+    setMostrarRegistro(false); // Después de registrar, ir a login
   };
 
   const handleLogin = (usuario: Usuario) => {
     setUsuarioActivo(usuario);
-    setMensajeRegistro('');
   };
 
   const renderSeccion = () => {
     switch (seccion) {
       case 'Artistas': return <ArtistaPage />;
       case 'Contenido': return <ContenidoPage />;
-      case 'Estadísticas': return <EstadisticasPage />;
       case 'Eventos': return <EventosPage />;
       case 'Colaboraciones': return <ColaboracionesPage />;
       case 'Metas': return <MetasPage />;
@@ -63,29 +57,30 @@ const App = () => {
 
   if (!usuarioActivo) {
     return (
-      <div className="main-content">
-        {mostrarRegistro ? (
-          <>
-            <RegistroForm onRegistro={handleRegistrar} />
-            <p>¿Ya tienes cuenta? <button onClick={() => setMostrarRegistro(false)}>Inicia sesión</button></p>
-          </>
-        ) : (
-          <>
-            <LoginForm usuarios={usuarios} onLogin={handleLogin} />
-            {mensajeRegistro && <p style={{ color: 'green' }}>{mensajeRegistro}</p>}
-            <p>¿No tienes cuenta? <button onClick={() => setMostrarRegistro(true)}>Regístrate</button></p>
-          </>
-        )}
+      <div className="auth-container">
+        <div className="form-wrapper">
+          {mostrarRegistro ? (
+            <>
+              <RegistroForm onRegistro={handleRegistrar} />
+              <p className="switch-text">¿Ya tienes cuenta? <button onClick={() => setMostrarRegistro(false)}>Inicia sesión</button></p>
+            </>
+          ) : (
+            <>
+              <LoginForm usuarios={usuarios} onLogin={handleLogin} />
+              <p className="switch-text">¿No tienes cuenta? <button onClick={() => setMostrarRegistro(true)}>Regístrate</button></p>
+            </>
+          )}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="app-container">
-      <aside className="sidebar">
-        <h2 className="logo">🎧 Plataforma</h2>
-        <nav>
-          {['Artistas', 'Contenido', 'Estadísticas', 'Eventos', 'Colaboraciones', 'Metas'].map((item) => (
+    <div className="main-app">
+      <header className="top-nav">
+        <h2 className="logo">🎧 ACISUM-MUSIC </h2>
+        <nav className="nav-buttons">
+          {['Artista', 'Contenido', 'Eventos', 'Colaboraciones', 'Metas'].map((item) => (
             <button
               key={item}
               className={seccion === item ? 'active' : ''}
@@ -95,17 +90,15 @@ const App = () => {
             </button>
           ))}
         </nav>
-        <button
-          onClick={() => {
-            localStorage.removeItem("usuarioActivo");
-            window.location.reload();
-          }}
-        >
+        <button className="logout-btn" onClick={() => {
+          localStorage.removeItem("usuarioActivo");
+          window.location.reload();
+        }}>
           Cerrar sesión
         </button>
-      </aside>
+      </header>
 
-      <main className="main-content">
+      <main className="section-wrapper">
         <h1>{seccion}</h1>
         {renderSeccion()}
       </main>

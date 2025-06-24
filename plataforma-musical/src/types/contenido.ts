@@ -1,8 +1,13 @@
 export interface Contenido {
   id: string;
-  artistaId: string;
-  titulo: string;
-  tipo: 'Canción' | 'Álbum';
+  usuarioId: string;  
+  tipo: string;       
+  titulo: string;    
   fecha_lanzamiento: string;
-  lyrics: string;
+  descripcion?: string;
+  imagen?: string;   
+  lyrics?: string;
+  reproducciones?: number;
+  likes?: number;
+  seguidores?: number; 
 }

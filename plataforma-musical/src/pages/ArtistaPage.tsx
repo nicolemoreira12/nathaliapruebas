@@ -1,76 +1,73 @@
 import { useEffect, useState } from 'react';
 import type { Artista } from '../types/artista';
-import { v4 as uuidv4 } from 'uuid';
+import ArtistaForm from '../components/ArtistaForm';
+import ArtistaList from '../components/ArtistaList';
 
 const ArtistaPage = () => {
   const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo') || 'null');
 
   const [artistas, setArtistas] = useState<Artista[]>(() => {
-    const stored = localStorage.getItem('artistas');
+    const stored = localStorage.getItem('artista');
     return stored ? JSON.parse(stored) : [];
   });
+
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [artistaEditando, setArtistaEditando] = useState<Artista | null>(null);
 
   useEffect(() => {
     localStorage.setItem('artistas', JSON.stringify(artistas));
   }, [artistas]);
 
-  const [nuevo, setNuevo] = useState({
-    nombre: '',
-    genero: '',
-    descripcion: '',
-    foto: '',
-  });
+  const artistaUsuario = artistas.find(a => a.usuarioId === usuarioActivo?.id);
 
-  const handleAgregar = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!usuarioActivo) return;
-    const Artista: Artista = {
-      ...nuevo,
-      id: uuidv4(),
-      usuarioId: usuarioActivo.id,
-      pais: ''
-    };
-    setArtistas([...artistas, Artista]);
-    setNuevo({ nombre: '', genero: '', descripcion: '', foto: '' });
+  const handleAgregar = (artista: Artista) => {
+    setArtistas([...artistas, { ...artista, usuarioId: usuarioActivo.id }]);
+    setModoEdicion(false);
   };
 
-  const artistasUsuario = artistas.filter(a => a.usuarioId === usuarioActivo?.id);
+  const handleEditar = (artistaEditado: Artista) => {
+    const actualizado = { ...artistaEditado, usuarioId: usuarioActivo.id };
+    setArtistas(prev =>
+      prev.map(a => (a.id === actualizado.id ? actualizado : a))
+    );
+    setModoEdicion(false);
+    setArtistaEditando(null);
+  };
+
+  const handleEliminar = (id: string) => {
+    const confirm = window.confirm('¿Seguro que quieres eliminar tu artista?');
+    if (confirm) {
+      setArtistas(prev => prev.filter(a => a.id !== id));
+      setModoEdicion(false);
+      setArtistaEditando(null);
+    }
+  };
+
+  const handleCancelar = () => {
+    setModoEdicion(false);
+    setArtistaEditando(null);
+  };
 
   return (
-    <div className="formulario">
-      <h2>Agregar Artista</h2>
-      <form onSubmit={handleAgregar}>
-        <div className="form-group">
-          <label>Nombre:</label>
-          <input value={nuevo.nombre} onChange={e => setNuevo({ ...nuevo, nombre: e.target.value })} required />
-        </div>
-        <div className="form-group">
-          <label>Género:</label>
-          <input value={nuevo.genero} onChange={e => setNuevo({ ...nuevo, genero: e.target.value })} required />
-        </div>
-        <div className="form-group">
-          <label>Descripción:</label>
-          <textarea value={nuevo.descripcion} onChange={e => setNuevo({ ...nuevo, descripcion: e.target.value })} required />
-        </div>
-        <div className="form-group">
-          <label>Foto URL:</label>
-          <input value={nuevo.foto} onChange={e => setNuevo({ ...nuevo, foto: e.target.value })} required />
-        </div>
-        <button type="submit" className="btn-agregar">Agregar</button>
-      </form>
-
-      <div className="card-lista">
-        {artistasUsuario.map((a) => (
-          <div key={a.id} className="card artista-card">
-            <img src={a.imagen} alt={a.nombre} className="artista-img" />
-            <div>
-              <h3>{a.nombre}</h3>
-              <p><strong>Género:</strong> {a.genero}</p>
-              <p>{a.descripcion}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div>
+      {/* Mostrar formulario si no hay artista o estamos en edición */}
+      {(!artistaUsuario || modoEdicion) ? (
+        <ArtistaForm
+          artistaInicial={modoEdicion && artistaEditando ? artistaEditando : undefined}
+          onGuardar={modoEdicion ? handleEditar : handleAgregar}
+          onCancelar={handleCancelar}
+          usuarioId={usuarioActivo.id}
+        />
+      ) : (
+        <ArtistaList
+          artistas={[artistaUsuario]}
+          onEditar={(artista) => {
+            setArtistaEditando(artista);
+            setModoEdicion(true);
+          }}
+          onEliminar={handleEliminar}
+        />
+      )}
     </div>
   );
 };
